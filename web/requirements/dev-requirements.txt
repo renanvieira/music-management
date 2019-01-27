@@ -1,0 +1,5 @@
+setuptools
+pip
+ipython
+ipdb
+-r test-requirements.txt

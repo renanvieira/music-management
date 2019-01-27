@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block page_title %}
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+          integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"/>
+</head>
+<body>
+<div class="container-fluid">
+    {% block body %}
+        {% with form=form %}
+            {% include "nav.html" %}
+        {% endwith %}
+
+        <main role="main">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    <a class="close" title="Close" href="#" data-dismiss="alert">&times;</a>
+                                    {{ message }}
+                                </div><!-- end .alert -->
+                            {% endfor %}
+                        </div><!-- end col-md -->
+                    </div><!-- end row -->
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        </div>
+
+
+    {% endblock %}
+</body>
+</html>

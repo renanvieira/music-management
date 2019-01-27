@@ -1,0 +1,7 @@
+<p>
+Your plan <strong>{}</strong> has been modified:
+</p>
+<p>
+Workout Schedule:
+</p>
+{}

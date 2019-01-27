@@ -1,0 +1,5 @@
+<p>
+Exercise: <strong>{}</strong><br/>
+Number of Sets: <strong>{}</strong><br/>
+Number of Reps: <strong>{}</strong><br/>
+</p>
