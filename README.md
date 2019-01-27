@@ -16,7 +16,7 @@ $ make start-docker
 
 #### Containers
    * `web`: web app running on port [`8085`](http://localhost:8085)
-   * `api`: API running on port [`5000`](http://localhost:5000)
+   * `api`: API running on port [`5000`](http://localhost:5051)
 
 If you need to stop/remove the containers use the following command:
 ```bash

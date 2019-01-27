@@ -6,7 +6,7 @@ stop-docker:
 
 run-tests:
 	nosetests tests/integration --with-coverage  --cover-package=music_management -s
-	coverage-badge -o coverage.svg
+	coverage-badge -f -o coverage.svg
 
 install:
 	pip install -r requirements/dev-requirements.txt
