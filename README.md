@@ -39,7 +39,7 @@ music_management/config.py                        37      0   100%
 music_management/db.py                             2      0   100%
 music_management/extensions.py                     4      0   100%
 music_management/helpers.py                        8      0   100%
-music_management/middleware.py                     3      0   100%
+music_management/middleware.py                     4      0   100%
 music_management/models.py                        11      0   100%
 music_management/resources/__init__.py             0      0   100%
 music_management/resources/album/__init__.py       0      0   100%
@@ -48,9 +48,9 @@ music_management/resources/album/schemas.py       24      0   100%
 music_management/resources/error.py               31      2    94%
 music_management/resources/ping.py                 4      0   100%
 ------------------------------------------------------------------
-TOTAL                                            256      3    99%
+TOTAL                                            257      3    99%
 ----------------------------------------------------------------------
-Ran 20 tests in 1.991s
+Ran 20 tests in 2.065s
 
 OK
 ```
