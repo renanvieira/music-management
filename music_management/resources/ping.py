@@ -5,4 +5,4 @@ ping_blueprint = Blueprint('ping', __name__)
 
 @ping_blueprint.route('/ping')
 def ping():
-    return 'Web Pong!'
+    return 'Pong!'

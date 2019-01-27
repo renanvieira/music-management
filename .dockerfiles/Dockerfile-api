@@ -1,0 +1,16 @@
+FROM python:3.6.7-alpine3.8
+
+EXPOSE 5000
+
+RUN mkdir -p /srv/app/music_management
+
+COPY ./music_management /srv/app/music_management
+WORKDIR /srv/app
+
+ENV FLASK_APP=music_management/app.py
+ENV FLASK_ENV=production
+RUN apk add --update gcc make g++ openssl-dev
+RUN pip install --upgrade pip
+RUN pip install -r music_management/requirements/dev-requirements.txt --user
+
+CMD  python -m flask run --port 5000 --host 0.0.0.0

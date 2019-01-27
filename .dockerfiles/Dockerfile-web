@@ -1,15 +1,16 @@
 FROM python:3.6.7-alpine3.8
 
-EXPOSE 5000
+EXPOSE 8000
 
-RUN mkdir /srv/app
+RUN mkdir -p /srv/app/web
 
-COPY . /srv/app
+COPY ./web /srv/app/web
 WORKDIR /srv/app
 
-ENV FLASK_APP=music_management/app.py
+ENV FLASK_APP=web/app.py
 ENV FLASK_ENV=production
-RUN apk add --update gcc make g++ openssl-dev libffi-dev
-RUN pip install -r requirements/dev-requirements.txt --user
+RUN apk add --update gcc make g++ openssl-dev
+RUN pip install --upgrade pip
+RUN pip install -r web/requirements/dev-requirements.txt --user
 
-CMD  python -m flask run --port 5002 --host 0.0.0.0
+CMD  python -m flask run --port 8000 --host 0.0.0.0
