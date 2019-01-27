@@ -16,18 +16,18 @@ class AlbumDeletionTestCase(BaseTestCase):
     def tearDown(self):
         super(AlbumDeletionTestCase, self).tearDown()
 
-    def test_delete_plan(self):
+    def test_delete_album(self):
         result = self.client.delete(f"/api/albums/{self.__album.id}")
 
         self.assert200(result)
 
-    def test_delete_plan_with_inexistent_id(self):
+    def test_delete_album_with_inexistent_id(self):
         result = self.client.delete(f"/api/albums/999788999")
 
         self.assert404(result)
 
     @mock.patch.object(Album, "query", new_callable=PropertyMock)
-    def test_delete_plan_with_error(self, mock_obj):
+    def test_delete_album_with_error(self, mock_obj):
         mock_obj.return_value.filter_by.side_effect = self.raise_exception
 
         result = self.client.delete(f"/api/albums/{self.__album.id}")

@@ -1,4 +1,4 @@
-"""create_users_table
+"""create_albums_table
 
 Revision ID: e90700904e77
 Revises: 

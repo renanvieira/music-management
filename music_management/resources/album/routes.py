@@ -98,17 +98,17 @@ def edit_album(album_id):
 @album_blueprint.route("/albums/<int:id>", methods=["DELETE"])
 def delete_album(id):
     try:
-        plan = Album.query.filter(Album.id == id, Album.deleted_at.is_(None)).first()
+        album = Album.query.filter(Album.id == id, Album.deleted_at.is_(None)).first()
 
-        if plan is None:
+        if album is None:
             return json.dumps(ObjectNotFound().new()), HTTPStatus.NOT_FOUND
 
-        plan.deleted_at = datetime.utcnow()
+        album.deleted_at = datetime.utcnow()
 
-        db.session.add(plan)
+        db.session.add(album)
         db.session.commit()
 
-        return album_schema.dumps(plan).data, HTTPStatus.OK
+        return album_schema.dumps(album).data, HTTPStatus.OK
 
     except Exception as e:
         return json.dumps(ResponseError.new_generic_error()), HTTPStatus.INTERNAL_SERVER_ERROR
@@ -124,9 +124,9 @@ def list_all_albums():
         if get_deleted is not None and get_deleted.lower() in ["true", "false"] and bool(get_deleted) is True:
             criterion = []
 
-        plan_paginator = Album.query.filter(*criterion).paginate(page, app.config['ITEMS_PER_PAGE'])
+        album_paginator = Album.query.filter(*criterion).paginate(page, app.config['ITEMS_PER_PAGE'])
 
-        paginated_data = PaginatorHelper.get_paginator_dict(plan_paginator)
+        paginated_data = PaginatorHelper.get_paginator_dict(album_paginator)
 
         return album_list_schema.dumps(paginated_data).data
 

@@ -1,7 +1,0 @@
-<p>
-Hi, {}!
-</p>
-
-<p>
-You are associated in a new workout plan called <strong>{}</strong>.
-</p>
