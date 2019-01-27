@@ -6,21 +6,20 @@ import pkgutil
 from flask import Flask, Blueprint
 from flask.logging import default_handler
 
-from music_management.config import ENVIRONMENTS, ConfigEnum
-from music_management.extensions import db_context, alembic
-from music_management.middleware import add_content_type_header
-from music_management.resources.ping import ping_blueprint
+from web.config import ENVIRONMENTS, ConfigEnum
+from web.extensions import csrf
+from web.resources.ping import ping_blueprint
 
 
 def __get_blueprint_from_resource_module():
-    modules = importlib.import_module("music_management.resources")
+    modules = importlib.import_module("web.resources")
 
     packages = [item for item in pkgutil.walk_packages(modules.__path__) if item.ispkg is True]
 
     blueprints = list()
 
     for _loader, name, is_pkg in packages:
-        resource_route_module = importlib.import_module(f"music_management.resources.{name}.routes")
+        resource_route_module = importlib.import_module(f"web.resources.{name}.routes")
         members = inspect.getmembers(resource_route_module)
 
         module_blueprints = [item[1] for item in members if isinstance(item[1], Blueprint)]
@@ -40,13 +39,11 @@ def register_blueprints(app):
 
 
 def register_extensions(app):
-    db_context.init_app(app)
-    alembic.init_app(app, True, "db")
+    csrf.init_app(app)
     return None
 
 
 def register_middlewares(app):
-    app.after_request(add_content_type_header)
     return None
 
 
@@ -63,9 +60,6 @@ def create_app(env=None):
     register_blueprints(app)
     register_middlewares(app)
     register_logging(app)
-
-    with app.app_context():
-        alembic.upgrade()
 
     return app
 

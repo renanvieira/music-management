@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="row">
-        <div class="col">
-            <h1>Welcome</h1>
+        <div class="col-8">
+            {% include "albums/pagination.html" %}
         </div>
     </div>
     <div class="row">
-        <div class="col-sm">
+        <div class="col-md">
             <table class="table table-striped table-bordered">
                 <thead class="thead-dark">
                 <tr>
@@ -14,38 +14,28 @@
                     <th scope="col">Name</th>
                     <th scope="col">Artist</th>
                     <th scope="col">Release Date</th>
+                    <th scope="col">&nbsp;</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Test Album With Mock 1</td>
-                    <td>Sargent Peppers and the Lonely Heart QA Band</td>
-                    <td>2018-01-01</td>
-                </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Test Album With Mock 2</td>
-                    <td>Sargent Peppers and the Lonely Heart QA Band</td>
-                    <td>2018-02-01</td>
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td>Test Album With Mock 3</td>
-                    <td>Sargent Peppers and the Lonely Heart QA Band</td>
-                    <td>2018-03-01</td>
-                </tr>
+                {% for item in data.items %}
+                    <tr>
+                        <th scope="row">{{ loop.index if current_page == 1 else loop.index + (10*(current_page-1)) }}</th>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.artist }}</td>
+                        <td>{{ item.release_date }}</td>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a class="btn btn-primary" href="{{ url_for("album.edit", id=item.id) }}" role="button">Edit</a>
+                                <a class="btn btn-danger" href="{{ url_for("album.delete", id=item.id) }}" role="button">Delete</a>
+                            </div>
+                        </td>
+
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                    <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                    <li class="page-item"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                </ul>
-            </nav>
+
 
         </div>
     </div>

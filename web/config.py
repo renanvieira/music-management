@@ -20,15 +20,12 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'RdDTA+yomt-~YQ~zk,!BGurrFJ~g6ba*'
-    SQLALCHEMY_DATABASE_URI = "sqlite:///data/album_database.db"
-    ITEMS_PER_PAGE = 10
+    BASE_API_ENDPOINT = "http://api:5000/api"
 
 
 class ProductionConfig(Config):
     DEVELOPMENT = False
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = "sqlite:///data/album_database.db"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class StagingConfig(Config):
@@ -39,16 +36,12 @@ class StagingConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "sqlite:///data/album_database.db"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    BASE_API_ENDPOINT = "http://127.0.0.1:5002/api"
 
 
 class TestingConfig(Config):
     TESTING = True
     ENV = "testing"
-    SQLALCHEMY_DATABASE_URI = "sqlite:///data/album_database_test.db"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    ITEMS_PER_PAGE = 2
 
 
 ENVIRONMENTS = {

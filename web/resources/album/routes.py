@@ -1,135 +1,182 @@
-import json
-from datetime import datetime
 from http import HTTPStatus
 
-import marshmallow
-from flask import Blueprint
-from flask import request, current_app as app
+import requests
+from flask import Blueprint, render_template, current_app as app, request, flash, redirect
+from flask_wtf.csrf import CSRFError
 
-from music_management.db import db_context as db
-from music_management.helpers import PaginatorHelper
-from music_management.models import (Album)
-from music_management.resources.album.schemas import (album_schema, album_update_schema, album_list_schema)
-from music_management.resources.error import (ResponseError,
-                                              ValidationError,
-                                              ObjectAlreadyRegisteredError, ObjectNotFound)
+from web.models import AlbumTable, AddAlbumForm, AlbumItem, API_FORM_MAP
 
-album_blueprint = Blueprint("album", __name__, url_prefix="/api")
+blueprint = Blueprint("album", __name__, url_prefix="/")
 
 
-@album_blueprint.route("/albums", methods=["POST"])
-def create_album():
+@blueprint.route("/")
+def index():
+    current_route = "index"
+    current_page = int(request.args.get("page", 1))
+    table_data = AlbumTable(list(), 0, 0)
+
     try:
-        schema = album_schema.load(request.get_json()).data
+        result = requests.get(f"{app.config['BASE_API_ENDPOINT']}/albums?page={current_page}")
 
-        if Album.query.filter_by(name=schema["name"]).count() > 0:
-            return json.dumps(
-                ObjectAlreadyRegisteredError().new("album", "name", schema["name"])), HTTPStatus.BAD_REQUEST
-
-        album = Album(name=schema["name"], artist=schema["artist"], release_date=schema["release_date"])
-
-        db.session.add(album)
-        db.session.commit()
-
-        return json.dumps(album_schema.dump(album).data)
-
-    except marshmallow.ValidationError as validation_err:
-        app.logger.exception(validation_err)
-        return json.dumps(ValidationError.new_from_marshmallow_error_dict(validation_err)), HTTPStatus.BAD_REQUEST
-
+        if result.status_code == HTTPStatus.OK:
+            json_result = result.json()
+            table_data = AlbumTable.parse_from_json_dict(json_result)
     except Exception as e:
         app.logger.exception(e)
-        return json.dumps(ResponseError.new_generic_error()), HTTPStatus.INTERNAL_SERVER_ERROR
+        flash("Error trying to load album list.", "danger")
+
+    if current_page != 1 and table_data.total_pages == 0:
+        current_page = 1
+
+    return render_template("albums/index.html",
+                           data=table_data,
+                           page_name=current_route,
+                           current_page=current_page,
+                           prev_page=current_page - 1 if current_page > 1 else False,
+                           next_page=current_page + 1 if current_page < table_data.total_pages else False,
+                           page_list=range(1, table_data.total_pages + 1))
 
 
-@album_blueprint.route("/albums/<album_id>", methods=["GET"])
-def get_album(album_id):
-    try:
+@blueprint.route("/add", methods=["GET"])
+def add():
+    current_route = "add_form"
+    form = AddAlbumForm(request.form)
 
-        album = Album.query.filter(Album.id == album_id, Album.deleted_at.is_(None)).first()
-
-        if album is None:
-            return json.dumps(ObjectNotFound().new()), HTTPStatus.NOT_FOUND
-
-        return json.dumps(album_schema.dump(album).data)
-
-    except Exception as e:
-        app.logger.exception(e)
-        return json.dumps(ResponseError.new_generic_error()), HTTPStatus.INTERNAL_SERVER_ERROR
+    return render_template("albums/add.html", form=form, page_name=current_route)
 
 
-@album_blueprint.route("/albums/<album_id>", methods=["POST"])
-def edit_album(album_id):
-    try:
-        schema = album_update_schema.load(request.get_json()).data
+@blueprint.route("/add", methods=["POST"])
+def add_album():
+    current_route = "add_form"
+    form = AddAlbumForm(request.form)
 
-        album = Album.query.filter(Album.id == album_id, Album.deleted_at.is_(None)).first()
+    if form.validate():
+        payload = dict()
+        payload["artist"] = request.form["artist_name"]
+        payload["name"] = request.form["name"]
+        payload["release_date"] = request.form["release_date"]
 
-        if album is None:
-            return json.dumps(ObjectNotFound().new()), HTTPStatus.NOT_FOUND
-
-        if "name" in schema:
-            criterion = [Album.name == schema["name"]]
-            if "artist" in schema:
-                criterion.append(Album.artist == schema["artist"])
+        try:
+            result = requests.post(f"{app.config['BASE_API_ENDPOINT']}/albums", json=payload)
+            if result.status_code != HTTPStatus.OK:
+                flash(f"Error while trying to talk with API: API returned HTTP {result.status_code}", "danger")
             else:
-                criterion.append(Album.artist == album.artist)
+                flash(f"Album added successfully.", "success")
+                return redirect("/")
+        except Exception as e:
+            app.logger.exception(e)
+            flash(f"Error while trying to talk with API.", "danger")
+    else:
+        for field, msg_list in form.errors.items():
+            flash(f"<strong>{getattr(form, field).label.text}&nbsp;</strong>{msg_list[0]}", "validation_error")
 
-            if Album.query.filter(*criterion).count() > 0:
-                return json.dumps(
-                    ObjectAlreadyRegisteredError().new("album", "name", schema["name"])), HTTPStatus.BAD_REQUEST
-
-        for key, val in schema.items():
-            setattr(album, key, val)
-
-        db.session.add(album)
-        db.session.commit()
-
-        return json.dumps(album_schema.dump(album).data)
-
-    except marshmallow.ValidationError as validation_err:
-        app.logger.exception(validation_err)
-        return json.dumps(ValidationError.new_from_marshmallow_error_dict(validation_err)), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        app.logger.exception(e)
-        return json.dumps(ResponseError.new_generic_error()), HTTPStatus.INTERNAL_SERVER_ERROR
+    return render_template("albums/add.html", form=form, page_name=current_route)
 
 
-@album_blueprint.route("/albums/<int:id>", methods=["DELETE"])
-def delete_album(id):
+@blueprint.route("/edit/<int:id>", methods=["GET"])
+def edit(id):
+    current_route = "edit_form"
+
     try:
-        plan = Album.query.filter(Album.id == id, Album.deleted_at.is_(None)).first()
+        result = requests.get(f"{app.config['BASE_API_ENDPOINT']}/albums/{id}")
 
-        if plan is None:
-            return json.dumps(ObjectNotFound().new()), HTTPStatus.NOT_FOUND
-
-        plan.deleted_at = datetime.utcnow()
-
-        db.session.add(plan)
-        db.session.commit()
-
-        return album_schema.dumps(plan).data, HTTPStatus.OK
-
-    except Exception as e:
-        return json.dumps(ResponseError.new_generic_error()), HTTPStatus.INTERNAL_SERVER_ERROR
-
-
-@album_blueprint.route("/albums", methods=["GET"])
-def list_all_albums():
-    try:
-        criterion = [Album.deleted_at.is_(None)]
-        get_deleted = request.args.get('deleted')
-        page = int(request.args.get("page", 1))
-
-        if get_deleted is not None and get_deleted.lower() in ["true", "false"] and bool(get_deleted) is True:
-            criterion = []
-
-        plan_paginator = Album.query.filter(*criterion).paginate(page, app.config['ITEMS_PER_PAGE'])
-
-        paginated_data = PaginatorHelper.get_paginator_dict(plan_paginator)
-
-        return album_list_schema.dumps(paginated_data).data
+        if result.status_code == HTTPStatus.OK:
+            json_result = result.json()
+            data = AlbumItem.parse_from_json_dict(json_result)
+            form = AddAlbumForm(request.form, obj=data)
 
     except Exception as e:
         app.logger.exception(e)
-        return json.dumps(ResponseError.new_generic_error()), HTTPStatus.INTERNAL_SERVER_ERROR
+        flash("Error trying to load album details.", "danger")
+
+    return render_template("albums/add.html", page_name=current_route, form=form, data=data)
+
+
+@blueprint.route("/edit/<int:id>", methods=["POST"])
+def edit_post(id):
+    current_route = "edit_form"
+    form = AddAlbumForm(request.form)
+    data = None
+
+    if form.validate():
+        payload = dict()
+        payload["artist"] = request.form["artist_name"]
+        payload["name"] = request.form["name"]
+        payload["release_date"] = request.form["release_date"]
+
+        data = AlbumItem(id, name=payload["name"], artist_name=payload["artist"], release_date=payload["release_date"])
+        try:
+            result = requests.post(f"{app.config['BASE_API_ENDPOINT']}/albums/{id}", json=payload)
+            if result.status_code == HTTPStatus.OK:
+                flash(f"Album updated successfully.", "success")
+                data = AlbumItem.parse_from_json_dict(result.json())
+                return redirect("/")
+            elif result.status_code == HTTPStatus.BAD_REQUEST:
+                errors = result.json()
+                if "error" in errors and "validation_errors" in errors["error"]:
+                    for err in errors["error"]["validation_errors"]:
+                        field = API_FORM_MAP[err['field']]
+                        msg = err['message']
+                        flash(f"<strong>{getattr(form, field).label.text}&nbsp;</strong>{msg}", "validation_error")
+
+            else:
+
+                app.logger.info(result.json())
+                flash(f"Error while trying to talk with API: API returned HTTP {result.status_code}", "danger")
+                return redirect("/")
+
+        except Exception as e:
+            app.logger.exception(e)
+            flash(f"Error while trying to talk with API.", "danger")
+    else:
+        for field, msg_list in form.errors.items():
+            flash(f"<strong>{getattr(form, field).label.text}&nbsp;</strong>{msg_list[0]}", "validation_error")
+
+    return render_template("albums/add.html", form=form, data=data, page_name=current_route)
+
+
+@blueprint.route("/delete/<int:id>", methods=["GET"])
+def delete(id):
+    current_route = "delete_form"
+
+    try:
+        result = requests.get(f"{app.config['BASE_API_ENDPOINT']}/albums/{id}")
+
+        if result.status_code == HTTPStatus.OK:
+            json_result = result.json()
+            data = AlbumItem.parse_from_json_dict(json_result)
+            form = AddAlbumForm(request.form, obj=data)
+
+    except Exception as e:
+        app.logger.exception(e)
+        flash("Error trying to load album details.", "danger")
+
+    return render_template("albums/add.html", page_name=current_route, form=form, data=data, read_only_all=True)
+
+
+@blueprint.route("/delete/<int:id>", methods=["POST"])
+def delete_post(id):
+    current_route = "delete_form"
+
+    try:
+        result = requests.delete(f"{app.config['BASE_API_ENDPOINT']}/albums/{id}")
+        if result.status_code != HTTPStatus.OK:
+            flash(f"Error while trying to talk with API: API returned HTTP {result.status_code}", "danger")
+        else:
+            flash(f"Album deleted successfully.", "success")
+            return redirect("/")
+    except Exception as e:
+        app.logger.exception(e)
+        flash(f"Error while trying to talk with API.", "danger")
+
+    return render_template("albums/add.html", page_name=current_route)
+
+
+@blueprint.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    current_route = "add_form"
+    form = AddAlbumForm(request.form)
+
+    flash("Somenthing went wrong, please try again.", "danger")
+
+    return render_template("albums/add.html", form=form, page_name=current_route)
