@@ -1,0 +1,98 @@
+{
+  "total": 12,
+  "items": [
+    {
+      "artist": "Oasis",
+      "deleted_at": null,
+      "id": 5,
+      "created_at": "2019-01-27T00:50:21.920837+00:00",
+      "name": "(What's the Story) Morning Glory?",
+      "release_date": "1995-10-06",
+      "updated_at": null
+    },
+    {
+      "artist": "Green Day",
+      "deleted_at": null,
+      "id": 6,
+      "created_at": "2019-01-27T00:50:41.345101+00:00",
+      "name": "Dookie",
+      "release_date": "1995-10-06",
+      "updated_at": null
+    },
+    {
+      "artist": "The Offspring",
+      "deleted_at": null,
+      "id": 7,
+      "created_at": "2019-01-27T00:51:03.160782+00:00",
+      "name": "Smash",
+      "release_date": "1998-11-06",
+      "updated_at": null
+    },
+    {
+      "artist": "Blur",
+      "deleted_at": null,
+      "id": 8,
+      "created_at": "2019-01-27T00:51:28.740206+00:00",
+      "name": "Blur",
+      "release_date": "1998-11-08",
+      "updated_at": null
+    },
+    {
+      "artist": "Metallica",
+      "deleted_at": null,
+      "id": 9,
+      "created_at": "2019-01-27T00:51:41.777176+00:00",
+      "name": "Metallica",
+      "release_date": "1992-11-11",
+      "updated_at": null
+    },
+    {
+      "artist": "No Doubt",
+      "deleted_at": null,
+      "id": 11,
+      "created_at": "2019-01-27T00:52:22.116946+00:00",
+      "name": "Tragic Kingdom",
+      "release_date": "1997-01-02",
+      "updated_at": null
+    },
+    {
+      "artist": "Rage Against The Machine",
+      "deleted_at": null,
+      "id": 12,
+      "created_at": "2019-01-27T00:52:48.996984+00:00",
+      "name": "Rage Against The Machine",
+      "release_date": "1992-05-03",
+      "updated_at": null
+    },
+    {
+      "artist": "asdfsafd",
+      "deleted_at": null,
+      "id": 13,
+      "created_at": "2019-01-27T02:52:58.058025+00:00",
+      "name": "asfasdfsadf",
+      "release_date": "2019-01-09",
+      "updated_at": null
+    },
+    {
+      "artist": "Punk Band",
+      "deleted_at": null,
+      "id": 16,
+      "created_at": "2019-01-27T03:44:18.767980+00:00",
+      "name": "Punk Test",
+      "release_date": "2019-01-02",
+      "updated_at": "2019-01-27T05:03:27.563882+00:00"
+    },
+    {
+      "artist": "Amanda Palmer",
+      "deleted_at": null,
+      "id": 17,
+      "created_at": "2019-01-28T18:15:00.131507+00:00",
+      "name": "Drowning In The Sound",
+      "release_date": "2019-01-09",
+      "updated_at": null
+    }
+  ],
+  "limit": 10,
+  "total_pages": 2,
+  "has_more": true
+}

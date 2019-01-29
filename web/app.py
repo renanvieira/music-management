@@ -40,6 +40,7 @@ def register_blueprints(app):
 
 def register_extensions(app):
     csrf.init_app(app)
+
     return None
 
 

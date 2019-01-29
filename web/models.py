@@ -2,17 +2,17 @@ from wtforms import Form, validators, StringField, DateField
 
 
 class AlbumItem(object):
-    def __init__(self, id, name, artist_name, release_date):
+    def __init__(self, id, name, artist, release_date):
         self.id = id
         self.name = name
-        self.artist = artist_name
+        self.artist = artist
         self.release_date = release_date
 
     @classmethod
     def parse_from_json_dict(cls, json_dict):
         return AlbumItem(id=json_dict["id"],
                          name=json_dict["name"],
-                         artist_name=json_dict["artist"],
+                         artist=json_dict["artist"],
                          release_date=json_dict["release_date"])
 
 
@@ -34,13 +34,13 @@ class AlbumTable(object):
 
 
 class AddAlbumForm(Form):
-    artist_name = StringField('Artist Name:', validators=[validators.required(), validators.Length(min=1, max=64)])
+    artist = StringField('Artist Name:', validators=[validators.required(), validators.Length(min=1, max=64)])
     name = StringField('Album Name:', validators=[validators.required(), validators.Length(min=1, max=64)])
     release_date = DateField('Release Date:', validators=[validators.required()])
 
 
 API_FORM_MAP = {
-    "artist": "artist_name",
+    "artist": "artist",
     "name": "name",
     "release_date": "release_date"
 }

@@ -1,5 +1,5 @@
 <nav aria-label="Page navigation example">
-    <ul class="pagination">
+    <ul class="pagination pull-right">
         <li class="page-item {{ "disabled" if prev_page == false }}">
             <a class="page-link"
                href="{{ "?page="+prev_page|string if prev_page != False else "javascript:void(0);" }}">

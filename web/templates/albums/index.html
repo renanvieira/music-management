@@ -1,23 +1,31 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="row">
-        <div class="col-8">
+        <div class="col-11">
             {% include "albums/pagination.html" %}
+        </div>
+        <div class="col-1">
+            <a href="{{ url_for("album.add") }}" class="btn btn-primary">New Album</a>
         </div>
     </div>
     <div class="row">
         <div class="col-md">
             <table class="table table-striped table-bordered">
                 <thead class="thead-dark">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Artist</th>
-                    <th scope="col">Release Date</th>
-                    <th scope="col">&nbsp;</th>
-                </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Artist</th>
+                        <th scope="col">Release Date</th>
+                        <th scope="col">&nbsp;</th>
+                    </tr>
                 </thead>
                 <tbody>
+                {% if not data.items or data.items|length == 0 %}
+                    <tr align="center">
+                        <td colspan="5">No Albums available to show.</td>
+                    </tr>
+                {% endif %}
                 {% for item in data.items %}
                     <tr>
                         <th scope="row">{{ loop.index if current_page == 1 else loop.index + (10*(current_page-1)) }}</th>
@@ -27,7 +35,8 @@
                         <td>
                             <div class="btn-group" role="group" aria-label="...">
                                 <a class="btn btn-primary" href="{{ url_for("album.edit", id=item.id) }}" role="button">Edit</a>
-                                <a class="btn btn-danger" href="{{ url_for("album.delete", id=item.id) }}" role="button">Delete</a>
+                                <a class="btn btn-danger" href="{{ url_for("album.delete", id=item.id) }}"
+                                   role="button">Delete</a>
                             </div>
                         </td>
 
