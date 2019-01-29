@@ -49,7 +49,7 @@ All API tests are located [here](tests/api).
 ## Frontend
 Here is where I struggled due to my lack of experience on frontend javascript frameworks. I wasn't able to learn the React concepts in so short notice, so I built another Flask application for the frontend using just one extension to help handle the form.
 
-I even tried to build the frontend using React but, after a few hours trying to get something to work, I decide to use a simpler approach using my knowledge.  
+I even started the frontend using React but, after a few hours trying to get something to work, I decide to use a simpler approach using the tools I already know.  
 
 
 
